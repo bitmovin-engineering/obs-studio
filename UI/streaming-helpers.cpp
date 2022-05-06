@@ -107,6 +107,9 @@ void StreamSettingsUI::UpdateKeyLink()
 	if (serviceName == "Dacast") {
 		ui_streamKeyLabel->setText(
 			QTStr("Basic.AutoConfig.StreamPage.EncoderKey"));
+	} else if (serviceName == "Bitmovin") {
+		ui_streamKeyLabel->setText(
+			QTStr("Basic.AutoConfig.StreamPage.ApiKey"));
 	} else {
 		ui_streamKeyLabel->setText(
 			QTStr("Basic.AutoConfig.StreamPage.StreamKey"));
@@ -116,6 +119,10 @@ void StreamSettingsUI::UpdateKeyLink()
 		ui_streamKeyButton->hide();
 	} else {
 		ui_streamKeyButton->setTargetUrl(QUrl(streamKeyLink.c_str()));
+		if (serviceName == "Bitmovin") {
+			ui_streamKeyButton->setText(
+				QTStr("Basic.AutoConfig.StreamPage.GetApiKey"));
+		}
 		ui_streamKeyButton->show();
 	}
 }
