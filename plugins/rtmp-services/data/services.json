@@ -2605,12 +2605,7 @@
             "name": "Bitmovin",
             "more_info_link": "https://bitmovin.com/docs/encoding/tutorials/contribution-encoder-obs-studio-example",
             "stream_key_link": "https://bitmovin.com/dashboard/account",
-            "servers": [
-            {
-                "name": "Latest",
-                "url": ""
-            }
-            ],
+            "servers": [],
             "recommended": {
             "keyint": 2
             }

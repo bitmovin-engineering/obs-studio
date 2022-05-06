@@ -61,7 +61,7 @@ void OBSBasicSettings::InitStreamPage()
 
 	streamUi.Setup(ui->streamKeyLabel, ui->service, ui->server,
 		       ui->customServer, ui->moreInfoButton,
-		       ui->getStreamKeyButton);
+		       ui->getStreamKeyButton, ui->serverLabel);
 
 	streamUi.LoadServices(false);
 

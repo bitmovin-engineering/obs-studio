@@ -186,6 +186,16 @@ void StreamSettingsUI::UpdateServerList()
 
 	ui_server->clear();
 
+	if (serviceName == "Bitmovin") {
+		ui_serverLabel->setText(
+			QTStr("Basic.AutoConfig.StreamPage.RunningStream"));
+		ui_server->addItem(QTStr("Basic.AutoConfig.StreamPage.Latest"),
+				   "");
+		return;
+	}
+	ui_serverLabel->setText(
+		QTStr("Basic.AutoConfig.StreamPage.Server"));
+
 	auto &servers = service["servers"].array_items();
 	for (const Json &entry : servers) {
 		ui_server->addItem(entry["name"].string_value().c_str(),
