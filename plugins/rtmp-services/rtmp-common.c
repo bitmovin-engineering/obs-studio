@@ -10,6 +10,7 @@
 #include "service-specific/nimotv.h"
 #include "service-specific/showroom.h"
 #include "service-specific/dacast.h"
+#include "service-specific/bitmovin.h"
 
 struct rtmp_common {
 	char *service;
@@ -50,6 +51,8 @@ static void ensure_valid_url(struct rtmp_common *service, json_t *json,
 	if (!service->server || !servers || !json_is_array(servers))
 		return;
 	if (astrstri(service->service, "Facebook") == NULL)
+		return;
+	if (astrstri(service->service, "Bitmovin") == NULL)
 		return;
 
 	json_array_foreach (servers, index, server) {
@@ -150,6 +153,9 @@ static void rtmp_common_update(void *data, obs_data_t *settings)
 		}
 	}
 	json_decref(root);
+	if (service->service && strcmp(service->service, "Bitmovin") == 0) {
+		bitmovin_update(service->key);
+	}
 
 	if (!service->output)
 		service->output = bstrdup("rtmp_output");
@@ -381,7 +387,7 @@ static void fill_servers(obs_property_t *servers_prop, json_t *service,
 {
 	json_t *servers, *server;
 	size_t index;
-
+	blog(LOG_INFO, "fill servers: '%s'", name);
 	obs_property_list_clear(servers_prop);
 
 	servers = json_object_get(service, "servers");
@@ -470,6 +476,7 @@ static inline json_t *find_service(json_t *root, const char *name,
 static bool service_selected(obs_properties_t *props, obs_property_t *p,
 			     obs_data_t *settings)
 {
+	blog(LOG_INFO, "service_selected");
 	const char *name = obs_data_get_string(settings, "service");
 	json_t *root = obs_properties_get_param(props);
 	json_t *service;
@@ -654,7 +661,6 @@ static void rtmp_common_apply_settings(void *data, obs_data_t *video_settings,
 {
 	struct rtmp_common *service = data;
 	json_t *root = open_services_file();
-
 	if (root) {
 		initialize_output(service, root, video_settings,
 				  audio_settings);
@@ -716,6 +722,10 @@ static const char *rtmp_common_url(void *data)
 			return ingest->url;
 		}
 	}
+
+	if (service->service && strcmp(service->service, "Bitmovin") == 0) {
+		return bitmovin_get_ingest(service->key, service->server);
+	}
 	return service->server;
 }
 
@@ -737,6 +747,11 @@ static const char *rtmp_common_key(void *data)
 			ingest = dacast_ingest(service->key);
 			return ingest->streamkey;
 		}
+	}
+	// todo steam key muss gesetzt sein! oder an url / anhängen
+	if (service->service && strcmp(service->service, "Bitmovin") == 0) {
+		blog(LOG_INFO, "rtmp_common_key");
+		return bitmovin_get_stream_key();
 	}
 	return service->key;
 }
